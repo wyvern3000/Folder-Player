@@ -16,7 +16,6 @@
     - 播放列表紧凑排列，序号与标题完美对齐。
     - 支持源管理及拖拽/移动排序。
     - 支持文件/文件夹修改日期显示。
-    - 自动下一文件夹播放。
 
 ## 操作说明
 
@@ -30,19 +29,22 @@
 - **文件夹播放**：点击文件夹右侧的“播放”图标，或在文件夹内点击顶部的“播放当前文件夹”。
 - **随机播放**：在文件夹内点击顶部的“随机播放”图标，将随机打乱当前目录下的所有歌曲。
 
-### 3. 源管理 (WebDAV/NAS)
+### 3. 无限播放 (自动下一文件夹)
+- 在播放页点击右上角图标呼出播放列表，可看到 **“无限播放”** 按钮。
+- **开启后**：当前文件夹播放完毕，App 会自动寻找并开始播放下一个目录，实现真正的“无限”畅听。
+
+### 4. 智能排序
+- **默认排序**：在 [设置] 页面中，您可以配置全局默认的排序方式（按名称、日期或大小）。
+- **个性化记忆**：在任何文件夹内手动切换排序方式（点击标题栏的排序图标）后，App 会**自动记住该路径的专属排序方式**，下次进入时将自动应用。
+
+### 5. 源管理 (WebDAV/NAS)
 - 在浏览器主界面（Root），点击 **"Add WebDAV"**。
 - 输入您的服务器地址、路径、用户名及密码。
 - **排序/删除**：点击源右侧的展开图标，可以进行 **"Move Up/Down"** 排序或 **"Delete"** 删除。
 
-### 4. 播放列表管理
-- 在播放页点击右上角的“列表”图标呼出底栏（BottomSheet）。
-- 播放列表支持紧凑显示，可快速跳转曲目。
-
-### 5. 设置项
+### 6. 设置项
 - **封面大小**：支持切换 Standard（标准）与 Large（大封面）模式。
 - **歌词 API**：可手动配置在线歌词接口地址。
-- **自动下一文件夹**：当开启后，当前目录播放完毕会自动开始下一个目录。
 
 ---
 
@@ -70,16 +72,19 @@ A minimalist, beautiful, and powerful Android music player designed specifically
 - **Folder Playback**: Tap the "Play" icon next to a folder name or use the "Play Current" button inside a folder.
 - **Shuffle**: Use the "Shuffle" icon at the top of a folder to play all contents in random order.
 
-### 3. Source Management (WebDAV/NAS)
+### 3. Infinite Play (Auto-Next Folder)
+- Open the playlist (top right icon on Player screen) to find the **"Infinite Play"** toggle.
+- **When enabled**: The app will automatically jump to the next available directory once the current one finishes, providing an uninterrupted listening experience.
+
+### 4. Intelligent Sorting
+- **Default Sort**: Configure your preferred global sorting method (By Name, Date, or Size) in the [Settings] screen.
+- **Path-Specific Memory**: If you manually change the sort order in a specific folder, the app will **automatically remember that setting for that specific path** and apply it every time you return.
+
+### 5. Source Management (WebDAV/NAS)
 - Tap **"Add WebDAV"** on the browser root screen.
 - Enter your server URL, path, and credentials.
 - **Manage Sources**: Expand a source item to access **"Move Up/Down"** for reordering or **"Delete"** to remove.
 
-### 4. Playlist Management
-- Tap the "Playlist" icon in the top right of the player screen to open the BottomSheet.
-- The compact list allows for quick navigation and track selection.
-
-### 5. Settings
+### 6. Settings
 - **Cover Size**: Toggle between Standard and Large cover display modes.
 - **Lyric API**: Configure a custom URL for fetching online lyrics.
-- **Auto-Next Folder**: Enable this to automatically play the next directory when the current one finishes.
