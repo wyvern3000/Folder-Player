@@ -18,13 +18,31 @@
     - 支持文件/文件夹修改日期显示。
     - 自动下一文件夹播放。
 
-## 技术栈
+## 操作说明
 
-- **Jetpack Compose**：全响应式现代 UI 框架。
-- **Media3 (ExoPlayer)**：高性能音频流与分轨播放引擎。
-- **Coroutines & Flow**：响应式状态管理。
-- **Sardine-Android**：稳定可靠的 WebDAV 通讯库。
-- **Coil**：高效封面图像缓存与加载。
+### 1. 基础导航
+- App 采用三屏滑动设计：**[播放页] <-> [文件浏览器] <-> [设置]**。
+- 您可以左右滑动屏幕，或点击右上角的图标快速切换。
+
+### 2. 文件播放
+- **单曲播放**：在浏览器中点击任意音频文件即可开始播放当前文件夹。
+- **整轨/CUE 播放**：点击 `.cue` 文件，App 会自动解析并显示分轨列表。
+- **文件夹播放**：点击文件夹右侧的“播放”图标，或在文件夹内点击顶部的“播放当前文件夹”。
+- **随机播放**：在文件夹内点击顶部的“随机播放”图标，将随机打乱当前目录下的所有歌曲。
+
+### 3. 源管理 (WebDAV/NAS)
+- 在浏览器主界面（Root），点击 **"Add WebDAV"**。
+- 输入您的服务器地址、路径、用户名及密码。
+- **排序/删除**：点击源右侧的展开图标，可以进行 **"Move Up/Down"** 排序或 **"Delete"** 删除。
+
+### 4. 播放列表管理
+- 在播放页点击右上角的“列表”图标呼出底栏（BottomSheet）。
+- 播放列表支持紧凑显示，可快速跳转曲目。
+
+### 5. 设置项
+- **封面大小**：支持切换 Standard（标准）与 Large（大封面）模式。
+- **歌词 API**：可手动配置在线歌词接口地址。
+- **自动下一文件夹**：当开启后，当前目录播放完毕会自动开始下一个目录。
 
 ---
 
@@ -39,17 +57,29 @@ A minimalist, beautiful, and powerful Android music player designed specifically
 - **📜 Comprehensive Lyrics**: Supports local `.lrc` files, embedded ID3 tag lyrics, and custom online Lyric API integration.
 - **🚀 Seamless Resume**: Instantly restores the last played song, cover art, and lyrics upon app startup, eliminating the "No Song" flicker entirely.
 - **🎨 Premium Design**: Pure black dark theme with configurable cover sizes, featuring a refined interface and smooth animations.
-- **🎧 Intelligent Interaction**:
-    - Auto-pause on headphone disconnection.
-    - Compact playlist UI with pixel-perfect track number alignment.
-    - Source management with reordering support.
-    - File/Folder modification timestamps in the browser.
-    - Auto-next folder playback.
 
-## Tech Stack
+## Usage Instructions
 
-- **Jetpack Compose**: Modern declarative UI framework.
-- **Media3 (ExoPlayer)**: High-performance engine for audio streaming and clipping.
-- **Coroutines & Flow**: Reactive state management.
-- **Sardine-Android**: Robust WebDAV communication library.
-- **Coil**: Efficient cover art caching and loading.
+### 1. Basic Navigation
+- The app uses a three-screen pager: **[Player] <-> [Browser] <-> [Settings]**.
+- Swipe left/right or tap the icons in the header to navigate.
+
+### 2. Playback
+- **Single Track**: Tap any audio file in the browser to start playing the folder from that song.
+- **CUE Sheets**: Tap a `.cue` file to parse and play split tracks automatically.
+- **Folder Playback**: Tap the "Play" icon next to a folder name or use the "Play Current" button inside a folder.
+- **Shuffle**: Use the "Shuffle" icon at the top of a folder to play all contents in random order.
+
+### 3. Source Management (WebDAV/NAS)
+- Tap **"Add WebDAV"** on the browser root screen.
+- Enter your server URL, path, and credentials.
+- **Manage Sources**: Expand a source item to access **"Move Up/Down"** for reordering or **"Delete"** to remove.
+
+### 4. Playlist Management
+- Tap the "Playlist" icon in the top right of the player screen to open the BottomSheet.
+- The compact list allows for quick navigation and track selection.
+
+### 5. Settings
+- **Cover Size**: Toggle between Standard and Large cover display modes.
+- **Lyric API**: Configure a custom URL for fetching online lyrics.
+- **Auto-Next Folder**: Enable this to automatically play the next directory when the current one finishes.
