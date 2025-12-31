@@ -47,7 +47,8 @@
 - **封面大小**：支持切换 Standard（标准）与 Large（大封面）模式。
 - **歌词 API**：可手动配置在线歌词接口地址，默认地址可直接使用。
 
-歌词服务来自：https://github.com/HisAtri/LrcApi，建议自行搭建，感谢作者提供了公开API。
+歌词服务来自：https://github.com/HisAtri/LrcApi ，建议自行搭建，感谢作者提供了公开API。
+
 ---
 
 # Folder Player (English)
