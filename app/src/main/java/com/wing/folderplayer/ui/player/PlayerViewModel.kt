@@ -472,7 +472,7 @@ class PlayerViewModel : ViewModel() {
         
         // If we are NOT restoring, and the player is playing something we didn't expect,
         // we should update our context to match the player (reactive behavior).
-        if (!isRestoring && mediaId != null && !belongsToCurrentFolder) {
+        if (!isRestoring && !belongsToCurrentFolder) {
             // Update internal context to match reality in the player
             val extractedParent = if (mediaId.contains("#track_")) {
                 mediaId.substringBefore("#").substringBeforeLast('/')

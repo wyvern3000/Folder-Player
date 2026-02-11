@@ -98,7 +98,7 @@ fun LandscapePlayerLayout(
                         .fillMaxHeight()
                         .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Left))
                         .pointerInput(Unit) {
-                            detectVerticalDragGestures { change, dragAmount ->
+                            detectVerticalDragGestures { _, dragAmount ->
                                 // Detect upward swipe to show playlist, similar to portrait
                                 if (dragAmount < -30) {
                                     showPlaylist = true
@@ -127,8 +127,7 @@ fun LandscapePlayerLayout(
                         .padding(top = 16.dp, bottom = 16.dp, end = 24.dp)
                 ) {
                     LandscapeLyricsPanel(
-                        uiState = uiState,
-                        onDoubleTap = {} // No expand in landscape
+                        uiState = uiState
                     )
                 }
             }
@@ -148,7 +147,7 @@ fun LandscapePlayerLayout(
                     modifier = Modifier
                         .fillMaxSize()
                         .pointerInput(Unit) {
-                            detectVerticalDragGestures { change, dragAmount ->
+                            detectVerticalDragGestures { _, dragAmount ->
                                 // Detect downward swipe to close
                                 if (dragAmount > 30) {
                                     showPlaylist = false
@@ -459,8 +458,7 @@ fun LandscapeLeftControlPanel(
 
 @Composable
 fun LandscapeLyricsPanel(
-    uiState: PlayerUiState,
-    onDoubleTap: () -> Unit
+    uiState: PlayerUiState
 ) {
     if (uiState.lyrics.isNotEmpty()) {
         val listState = rememberLazyListState()

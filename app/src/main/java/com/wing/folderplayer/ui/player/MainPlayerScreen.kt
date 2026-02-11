@@ -142,7 +142,7 @@ private fun PortraitPlayerLayout(
                 .fillMaxSize()
                 .background(brush)
                 .pointerInput(Unit) {
-                    detectVerticalDragGestures { change, dragAmount ->
+                    detectVerticalDragGestures { _, dragAmount ->
                         // Detect upward swipe with a threshold
                         if (dragAmount < -30) {
                             showPlaylist = true

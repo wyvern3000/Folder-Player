@@ -23,7 +23,6 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun FolderPlayerTheme(
-    darkTheme: Boolean = true, // Force default to true
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {

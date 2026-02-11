@@ -102,6 +102,7 @@ class PlayerRepository {
         val extras = android.os.Bundle().apply {
             putLong("file_size", fileSize)
             putString("file_ext", fileExtension)
+            lrcUri?.let { putString("lrc_uri", it.toString()) }
         }
         
         val metadataBuilder = MediaMetadata.Builder()
