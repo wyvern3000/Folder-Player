@@ -27,10 +27,59 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 
+import android.content.pm.ActivityInfo
+import com.wing.folderplayer.data.prefs.OrientationPreferences
+import com.wing.folderplayer.data.prefs.NotchPreferences
+import android.view.WindowManager
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.runtime.LaunchedEffect
+
 class MainActivity : ComponentActivity() {
+    
+    private fun applyOrientation(orientation: String) {
+        requestedOrientation = when (orientation) {
+            OrientationPreferences.ORIENTATION_PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            OrientationPreferences.ORIENTATION_LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            else -> ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+    }
+    
+    private fun applyNotchMode(mode: String) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            window.attributes = window.attributes.also {
+                // FIXED: Always allow display cutout so switching doesn't trigger a layout jump/resize
+                it.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
+            // Toggle visual "Black Bar" effect by changing status bar transparency
+            window.statusBarColor = when (mode) {
+                NotchPreferences.NOTCH_BLACK_BAR -> android.graphics.Color.BLACK
+                else -> android.graphics.Color.TRANSPARENT
+            }
+            window.navigationBarColor = android.graphics.Color.TRANSPARENT
+            
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                window.isNavigationBarContrastEnforced = false
+            }
+        }
+    }
+    
     @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // RE-ENABLE edge-to-edge so background can flow into notch area
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        
+        // Apply saved orientation preference
+        val orientationPrefs = OrientationPreferences(this)
+        applyOrientation(orientationPrefs.getOrientation())
+        
+        // Apply saved notch mode preference
+        val notchPrefs = NotchPreferences(this)
+        applyNotchMode(notchPrefs.getNotchMode())
         
         // Request Permissions
         val permissionLauncher = registerForActivityResult(
@@ -51,6 +100,19 @@ class MainActivity : ComponentActivity() {
         permissionLauncher.launch(permissions)
 
         setContent {
+            val configuration = LocalConfiguration.current
+            
+            // Auto hide/show status bar based on orientation
+            LaunchedEffect(configuration.orientation) {
+                val controller = WindowCompat.getInsetsController(window, window.decorView)
+                if (configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE) {
+                     controller.hide(WindowInsetsCompat.Type.systemBars())
+                     controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                } else {
+                     controller.show(WindowInsetsCompat.Type.systemBars())
+                }
+            }
+
             FolderPlayerTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = androidx.compose.ui.graphics.Color.Black) {
                     val playerViewModel: PlayerViewModel = viewModel() 
@@ -105,7 +167,9 @@ class MainActivity : ComponentActivity() {
                                         scope.launch { pagerState.animateScrollToPage(0) }
                                     },
                                     currentCoverSize = state.coverDisplaySize,
-                                    onCoverSizeChange = { playerViewModel.setCoverDisplaySize(it) }
+                                    onCoverSizeChange = { playerViewModel.setCoverDisplaySize(it) },
+                                    onOrientationChange = { applyOrientation(it) },
+                                    onNotchModeChange = { applyNotchMode(it) }
                                 )
                             }
                         }

@@ -1178,18 +1178,25 @@ class PlayerViewModel : ViewModel() {
             }
 
             val mediaItems = items.map { pItem ->
-                androidx.media3.common.MediaItem.Builder()
-                    .setMediaId(pItem.path)
-                    .setUri(pItem.path)
-                    .setMediaMetadata(
-                        androidx.media3.common.MediaMetadata.Builder()
-                            .setTitle(pItem.title)
-                            .setArtist(pItem.artist?.takeIf { it.isNotBlank() })
-                            .setArtworkUri(pItem.artworkUri?.let { android.net.Uri.parse(it) })
-                            .build()
-                    )
-                    .build()
+            val uri = pItem.path
+            val finalUri = if (uri.startsWith("/") && !uri.startsWith("http")) {
+                "file://$uri"
+            } else {
+                uri
             }
+
+            androidx.media3.common.MediaItem.Builder()
+                .setMediaId(pItem.path)
+                .setUri(finalUri)
+                .setMediaMetadata(
+                    androidx.media3.common.MediaMetadata.Builder()
+                        .setTitle(pItem.title)
+                        .setArtist(pItem.artist?.takeIf { it.isNotBlank() })
+                        .setArtworkUri(pItem.artworkUri?.let { android.net.Uri.parse(it) })
+                        .build()
+                )
+                .build()
+        }
             
             player?.setMediaItems(mediaItems)
             if (startIndex in mediaItems.indices) {

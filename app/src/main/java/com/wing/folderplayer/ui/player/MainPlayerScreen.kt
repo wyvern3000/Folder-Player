@@ -59,11 +59,32 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
+import android.content.res.Configuration
+
+import androidx.compose.ui.platform.LocalConfiguration
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPlayerScreen(
     viewModel: PlayerViewModel = viewModel()
+) {
+    val configuration = LocalConfiguration.current
+    if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        val uiState by viewModel.uiState.collectAsState()
+        val context = LocalContext.current
+        LaunchedEffect(Unit) {
+            viewModel.initializeController(context)
+        }
+        LandscapePlayerLayout(viewModel = viewModel, uiState = uiState)
+    } else {
+        PortraitPlayerLayout(viewModel)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PortraitPlayerLayout(
+    viewModel: PlayerViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -132,6 +153,8 @@ fun MainPlayerScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
                     .padding(top = rootPaddingTop),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 // No SpaceBetween to allow tight packing at the top
@@ -336,10 +359,23 @@ fun MainPlayerScreen(
                                         label = "lyricScale"
                                     )
 
+                                    // Dynamic height based on lyric length and current line status
+                                    val isLongLyric = lyric.text.length > 40
+                                    val minLineHeight by androidx.compose.animation.core.animateDpAsState(
+                                        targetValue = when {
+                                            isCurrentLine && isLongLyric -> 56.dp  // Current line + long lyric
+                                            isCurrentLine -> 40.dp                  // Current line + normal lyric
+                                            else -> 32.dp                           // Non-current line
+                                        },
+                                        animationSpec = androidx.compose.animation.core.tween(durationMillis = 200),
+                                        label = "lineHeight"
+                                    )
+
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(32.dp), // Narrower line height
+                                            .defaultMinSize(minHeight = minLineHeight)
+                                            .wrapContentHeight(),  // Allow height to grow naturally
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
@@ -348,7 +384,10 @@ fun MainPlayerScreen(
                                             color = Color.White.copy(alpha = colorAlpha),
                                             fontWeight = if (isCurrentLine) FontWeight.ExtraBold else FontWeight.Normal,
                                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                            maxLines = if (isCurrentLine) 3 else 2,  // Allow more lines for current
+                                            overflow = TextOverflow.Ellipsis,
                                             modifier = Modifier
+                                                .padding(horizontal = 16.dp)  // Horizontal padding to prevent overflow when scaled
                                                 .graphicsLayer {
                                                     scaleX = scale
                                                     scaleY = scale
@@ -931,108 +970,7 @@ fun MainPlayerScreen(
     }
 }
 
-@Composable
-fun TimerDialog(
-    uiState: PlayerUiState,
-    onStart: (TimerType, Int) -> Unit,
-    onReset: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    var selectedMins by remember { mutableStateOf(if (uiState.sleepTimerType == TimerType.TIME) uiState.sleepTimerValue.toFloat() else 0f) }
-    var selectedSongs by remember { mutableStateOf(if (uiState.sleepTimerType == TimerType.SONGS) uiState.sleepTimerValue.toFloat() else 0f) }
-    var lastInteractedType by remember { mutableStateOf(uiState.sleepTimerType) }
 
-    // If active, show current countdown from uiState. If not, show what sliders represent.
-    val displayLabel = if (uiState.sleepTimerActive) uiState.sleepTimerLabel else {
-        if (lastInteractedType == TimerType.TIME) "${selectedMins.toInt()} min" else "${selectedSongs.toInt()} songs"
-    }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = null,
-        text = {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(verticalAlignment = Alignment.Bottom) {
-                    val statusColor = if (uiState.sleepTimerActive) MaterialTheme.colorScheme.primary else Color.White
-                    Text(
-                        "Stop after ",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = if (uiState.sleepTimerActive) statusColor else Color.White.copy(alpha = 0.6f),
-                        modifier = Modifier.padding(bottom = 6.dp)
-                    )
-                    Text(
-                        displayLabel,
-                        style = MaterialTheme.typography.displaySmall,
-                        fontWeight = FontWeight.Bold,
-                        color = statusColor
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(32.dp))
-                
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Slider(
-                        value = selectedMins,
-                        enabled = !uiState.sleepTimerActive,
-                        onValueChange = { 
-                            selectedMins = it
-                            if (it > 0) {
-                                selectedSongs = 0f
-                                lastInteractedType = TimerType.TIME 
-                            }
-                        },
-                        valueRange = 0f..99f,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text("mins", modifier = Modifier.width(44.dp).padding(start = 8.dp), style = MaterialTheme.typography.bodySmall)
-                }
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Slider(
-                        value = selectedSongs,
-                        enabled = !uiState.sleepTimerActive,
-                        onValueChange = { 
-                            selectedSongs = it
-                            if (it > 0) {
-                                selectedMins = 0f
-                                lastInteractedType = TimerType.SONGS 
-                            }
-                        },
-                        valueRange = 0f..50f,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text("songs", modifier = Modifier.width(44.dp).padding(start = 8.dp), style = MaterialTheme.typography.bodySmall)
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = { 
-                if (uiState.sleepTimerActive) {
-                    onDismiss()
-                } else {
-                    val value = if (lastInteractedType == TimerType.TIME) selectedMins.toInt() else selectedSongs.toInt()
-                    onStart(lastInteractedType, value)
-                    onDismiss()
-                }
-            }) { Text("OK") }
-        },
-        dismissButton = {
-            TextButton(onClick = { 
-                onReset()
-                selectedMins = 0f
-                selectedSongs = 0f
-                onDismiss()
-            }) { Text("RESET") }
-        },
-        containerColor = Color(0xFF1E1E1E),
-        textContentColor = Color.White
-    )
-}
 
 fun formatTime(ms: Long): String {
     val totalSeconds = ms / 1000

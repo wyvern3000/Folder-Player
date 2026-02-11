@@ -18,20 +18,41 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
 import com.wing.folderplayer.R
 import com.wing.folderplayer.data.prefs.LyricPreferences
+import com.wing.folderplayer.data.prefs.OrientationPreferences
+import com.wing.folderplayer.data.prefs.NotchPreferences
+import androidx.compose.ui.graphics.Color
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
     currentCoverSize: String,
-    onCoverSizeChange: (String) -> Unit
+    onCoverSizeChange: (String) -> Unit,
+    onOrientationChange: (String) -> Unit = {},  // Callback to notify MainActivity
+    onNotchModeChange: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     val lyricPrefs = remember { LyricPreferences(context) }
     var lyricApiUrl by remember { mutableStateOf(lyricPrefs.getLyricApiUrl()) }
     var isDebug by remember { mutableStateOf(com.wing.folderplayer.utils.CrashHandler.isDebugEnabled(context)) }
 
-    Scaffold(
+    // Use horizontal safe insets to prevent UI shift and camera overlap
+    val horizontalSafePadding = WindowInsets.displayCutout.asPaddingValues().let { 
+        val layoutDirection = androidx.compose.ui.platform.LocalLayoutDirection.current
+        maxOf(it.calculateLeftPadding(layoutDirection), it.calculateRightPadding(layoutDirection))
+    }
+
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+                .padding(horizontal = horizontalSafePadding)
+        ) {
+            Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Settings") },
@@ -68,6 +89,81 @@ fun SettingsScreen(
                     selected = currentCoverSize == "LARGE",
                     onClick = { onCoverSizeChange("LARGE") },
                     label = { Text("Large") }
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Screen Orientation
+            Text(
+                text = "Screen Orientation",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            val orientationPrefs = remember { OrientationPreferences(context) }
+            var currentOrientation by remember { mutableStateOf(orientationPrefs.getOrientation()) }
+            
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(
+                    selected = currentOrientation == OrientationPreferences.ORIENTATION_SYSTEM,
+                    onClick = { 
+                        currentOrientation = OrientationPreferences.ORIENTATION_SYSTEM
+                        orientationPrefs.setOrientation(currentOrientation)
+                        onOrientationChange(currentOrientation)
+                    },
+                    label = { Text("System") }
+                )
+                FilterChip(
+                    selected = currentOrientation == OrientationPreferences.ORIENTATION_PORTRAIT,
+                    onClick = { 
+                        currentOrientation = OrientationPreferences.ORIENTATION_PORTRAIT
+                        orientationPrefs.setOrientation(currentOrientation)
+                        onOrientationChange(currentOrientation)
+                    },
+                    label = { Text("Portrait") }
+                )
+                FilterChip(
+                    selected = currentOrientation == OrientationPreferences.ORIENTATION_LANDSCAPE,
+                    onClick = { 
+                        currentOrientation = OrientationPreferences.ORIENTATION_LANDSCAPE
+                        orientationPrefs.setOrientation(currentOrientation)
+                        onOrientationChange(currentOrientation)
+                    },
+                    label = { Text("Landscape") }
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Notch Display Mode
+            Text(
+                text = "Notch Display",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            val notchPrefs = remember { NotchPreferences(context) }
+            var currentNotchMode by remember { mutableStateOf(notchPrefs.getNotchMode()) }
+            
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(
+                    selected = currentNotchMode == NotchPreferences.NOTCH_FULLSCREEN,
+                    onClick = { 
+                        currentNotchMode = NotchPreferences.NOTCH_FULLSCREEN
+                        notchPrefs.setNotchMode(currentNotchMode)
+                        onNotchModeChange(currentNotchMode)
+                    },
+                    label = { Text("Fullscreen") }
+                )
+                FilterChip(
+                    selected = currentNotchMode == NotchPreferences.NOTCH_BLACK_BAR,
+                    onClick = { 
+                        currentNotchMode = NotchPreferences.NOTCH_BLACK_BAR
+                        notchPrefs.setNotchMode(currentNotchMode)
+                        onNotchModeChange(currentNotchMode)
+                    },
+                    label = { Text("Black Bar") }
                 )
             }
             
@@ -197,7 +293,7 @@ fun SettingsScreen(
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "Folder Player V0.4",
+                        text = "Folder Player V0.5",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -213,7 +309,7 @@ fun SettingsScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "Build Date: 2026-1-11",
+                        text = "Build Date: 2026-2-11",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -268,4 +364,6 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
+}
+}
 }

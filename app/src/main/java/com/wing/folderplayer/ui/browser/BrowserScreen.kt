@@ -86,7 +86,22 @@ fun BrowserScreen(
         )
     }
 
-    Scaffold(
+    val horizontalSafePadding = WindowInsets.displayCutout.asPaddingValues().let { 
+        val layoutDirection = androidx.compose.ui.platform.LocalLayoutDirection.current
+        maxOf(it.calculateLeftPadding(layoutDirection), it.calculateRightPadding(layoutDirection))
+    }
+
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+                .padding(horizontal = horizontalSafePadding)
+        ) {
+            Scaffold(
         topBar = {
             TopAppBar(
                 title = { 
@@ -194,6 +209,8 @@ fun BrowserScreen(
             }
         }
     }
+}
+}
 }
 
 @Composable

@@ -38,7 +38,7 @@ fun FolderPlayerTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = android.graphics.Color.BLACK
+            // statusBarColor is managed by MainActivity.applyNotchMode()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         }
     }
